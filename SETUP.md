@@ -75,6 +75,8 @@ Open [repository access settings](https://github.com/siddhhant142/Geofencing-Rea
 
 ## API examples
 
+Open the backend root URL in a browser to see the service status and links to the read endpoints. The root returns a small HTML status page; the API routes below return JSON.
+
 Create a geofence:
 
 ```powershell

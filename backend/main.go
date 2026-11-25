@@ -114,6 +114,54 @@ func writeError(w http.ResponseWriter, start time.Time, status int, message stri
 	withTiming(w, start, status, map[string]interface{}{"error": message})
 }
 
+const rootStatusPage = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GeoTrack API</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #0b1220; color: #e8eef8; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; }
+    main { box-sizing: border-box; width: min(680px, calc(100% - 32px)); padding: 36px; border: 1px solid #26354d; border-radius: 18px; background: #111b2c; }
+    .status { color: #7ee0aa; font-size: .85rem; font-weight: 700; letter-spacing: .08em; }
+    h1 { margin: 14px 0 8px; font-size: clamp(2rem, 6vw, 3rem); }
+    p { color: #aab8cd; line-height: 1.6; }
+    a { color: #91bbff; }
+    .dashboard { display: inline-block; margin: 8px 0 20px; padding: 11px 16px; border-radius: 9px; background: #2463eb; color: white; font-weight: 650; text-decoration: none; }
+    h2 { margin-top: 20px; font-size: 1.1rem; }
+    ul { padding-left: 20px; line-height: 1.9; }
+    code { color: #d3def0; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="status">● API ONLINE</div>
+    <h1>GeoTrack backend</h1>
+    <p>The service is healthy and ready to handle geofencing and fleet requests.</p>
+    <a class="dashboard" href="https://geofencing-real-time-alert-system-chi.vercel.app/">Open the GeoTrack dashboard</a>
+    <h2>Available API endpoints</h2>
+    <ul>
+      <li><a href="/vehicles">Vehicles</a></li>
+      <li><a href="/geofences">Geofences</a></li>
+      <li><a href="/alerts">Alerts</a></li>
+      <li><a href="/violations/history">Violation history</a></li>
+    </ul>
+    <p>Live alert updates use the <code>/ws/alerts</code> WebSocket endpoint.</p>
+  </main>
+</body>
+</html>`
+
+func handleRoot(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		writeError(w, time.Now(), http.StatusNotFound, "route not found")
+		return
+	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, rootStatusPage)
+}
+
 func (s *Server) cors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -450,13 +498,7 @@ func main() {
 	mux.HandleFunc("/alerts/configure", server.handleAlerts)
 	mux.HandleFunc("/violations/history", server.handleViolations)
 	mux.HandleFunc("/ws/alerts", server.handleWS)
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/" {
-			withTiming(w, time.Now(), 200, map[string]interface{}{"service": "geofencing-api", "status": "ok"})
-			return
-		}
-		writeError(w, time.Now(), 404, "route not found")
-	})
+	mux.HandleFunc("/", handleRoot)
 
 	port := os.Getenv("PORT")
 	if port == "" { port = "8080" }
