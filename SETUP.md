@@ -52,21 +52,21 @@ Then run **Actions → Publish backend image → Run workflow**. The image is pu
 
 ## Hosted deployment
 
-The GitHub repository is private, so authorize Render and Vercel to access it when connecting the project.
+The GitHub repository is private, so authorize Render and Vercel to access it when connecting the project. Deployment configuration is included in `render.yaml` and `frontend/vercel.json`.
 
-### Backend on Render
+### Free backend on Render
 
-1. In Render, create a **Web Service** and connect `siddhhant142/Geofencing-Real-time-Alert-System`.
-2. Set the root directory to `backend` and select the Docker runtime/Dockerfile.
-3. Add `DATA_FILE=/app/data/store.json`.
-4. Configure a persistent disk mounted at `/app/data`; without it, the JSON database is lost on redeploy/restart. Render persistent disks require a paid service plan, so check the price before creating the service.
-5. Deploy and copy the service URL. The Go server reads Render's `PORT` environment variable.
+1. Sign in to Render, choose **New → Blueprint**, and connect `siddhhant142/Geofencing-Real-time-Alert-System`.
+2. Render reads `render.yaml` and creates the Docker web service on its **Free** plan. Confirm the plan is Free before deploying.
+3. When deployment finishes, copy the service URL. The Go server reads Render's `PORT` environment variable.
 
-### Frontend on Vercel
+Free Render services sleep after 15 minutes without traffic, may take about a minute to wake, and have ephemeral filesystems. This app stores its demo data in `/tmp/geofencing-store.json`, so geofences, vehicles, and history can be lost when the service sleeps, restarts, or redeploys. Render persistent disks require a paid plan and are intentionally not configured here.
 
-1. Import the same private repository into Vercel and set the project root directory to `frontend`.
-2. Use build command `npm run build` and output directory `dist`.
-3. Add the environment variable `VITE_API_URL` with the deployed Render service URL (for example, `https://your-service.onrender.com`) for Production and Preview.
+### Free frontend on Vercel
+
+1. Sign in to Vercel Hobby (free) and import the same private repository. Authorize GitHub access if prompted.
+2. Set the project root directory to `frontend`; `frontend/vercel.json` provides the Vite build and SPA fallback settings.
+3. Add `VITE_API_URL` with the deployed Render service URL (for example, `https://your-service.onrender.com`) for Production and Preview.
 4. Deploy. The dashboard uses this value for both REST requests and `/ws/alerts`.
 
 ### GitHub collaborator invitations

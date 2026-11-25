@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: geofencing-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /
+    envVars:
+      - key: DATA_FILE
+        value: /tmp/geofencing-store.json
