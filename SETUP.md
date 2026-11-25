@@ -50,6 +50,29 @@ Add these repository Actions secrets under **Settings → Secrets and variables 
 Then run **Actions → Publish backend image → Run workflow**. The image is published as
 `<your-dockerhub-username>/geofencing-real-time-alert-api:latest` and tagged with the commit SHA.
 
+## Hosted deployment
+
+The GitHub repository is private, so authorize Render and Vercel to access it when connecting the project.
+
+### Backend on Render
+
+1. In Render, create a **Web Service** and connect `siddhhant142/Geofencing-Real-time-Alert-System`.
+2. Set the root directory to `backend` and select the Docker runtime/Dockerfile.
+3. Add `DATA_FILE=/app/data/store.json`.
+4. Configure a persistent disk mounted at `/app/data`; without it, the JSON database is lost on redeploy/restart. Render persistent disks require a paid service plan, so check the price before creating the service.
+5. Deploy and copy the service URL. The Go server reads Render's `PORT` environment variable.
+
+### Frontend on Vercel
+
+1. Import the same private repository into Vercel and set the project root directory to `frontend`.
+2. Use build command `npm run build` and output directory `dist`.
+3. Add the environment variable `VITE_API_URL` with the deployed Render service URL (for example, `https://your-service.onrender.com`) for Production and Preview.
+4. Deploy. The dashboard uses this value for both REST requests and `/ws/alerts`.
+
+### GitHub collaborator invitations
+
+Open [repository access settings](https://github.com/siddhhant142/Geofencing-Real-time-Alert-System/settings/access) → **Add people** and invite the remaining seven assessment emails with **Write** access. Invitations are already pending for the two verified source-repository contributors, `vedant-patil-mapup` and `dewanshpatle`; avoid sending duplicate invitations for those accounts.
+
 ## API examples
 
 Create a geofence:
