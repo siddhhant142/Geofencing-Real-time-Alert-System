@@ -9,4 +9,4 @@ FROM alpine:3.19
 WORKDIR /app
 COPY --from=build /geofencing-api /app/geofencing-api
 EXPOSE 8080
-CMD ["/geofencing-api"]
+CMD ["/app/geofencing-api"]
