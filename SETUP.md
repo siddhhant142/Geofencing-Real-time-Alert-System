@@ -40,6 +40,16 @@ docker compose up --build
 The frontend is available at `http://localhost:5173` and the API at `http://localhost:8080`.
 The containerized frontend proxies API requests and the `/ws/alerts` WebSocket through its Nginx server.
 
+## Publish the backend image
+
+Add these repository Actions secrets under **Settings → Secrets and variables → Actions**:
+
+- `DOCKERHUB_USERNAME`: your Docker Hub username
+- `DOCKERHUB_TOKEN`: a Docker Hub access token with write access
+
+Then run **Actions → Publish backend image → Run workflow**. The image is published as
+`<your-dockerhub-username>/geofencing-real-time-alert-api:latest` and tagged with the commit SHA.
+
 ## API examples
 
 Create a geofence:
